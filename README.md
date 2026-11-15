@@ -18,11 +18,11 @@ Markdown
 - [x] 터미널 기본 조작 및 작업 디렉토리 구성
 - [x] 파일 및 디렉토리 권한 변경 실습
 - [x] Docker 설치 및 버전/데몬 점검
-- [ ] 기본 컨테이너(`hello-world`, `ubuntu`) 실행 및 운영 명령 확인
-- [ ] 커스텀 `Dockerfile` 작성 및 웹 서버 이미지 빌드
-- [ ] 포트 매핑(`-p`)을 통한 브라우저 접속 확인
-- [ ] 바인드 마운트 실시간 반영 및 Docker 볼륨 영속성 검증
-- [ ] Git 사용자 설정 및 VSCode-GitHub 저장소 연동
+- [x] 기본 컨테이너(`hello-world`, `ubuntu`) 실행 및 운영 명령 확인
+- [x] 커스텀 `Dockerfile` 작성 및 웹 서버 이미지 빌드
+- [x] 포트 매핑(`-p`)을 통한 브라우저 접속 확인
+- [x] 바인드 마운트 실시간 반영 및 Docker 볼륨 영속성 검증
+- [x] Git 사용자 설정 및 VSCode-GitHub 저장소 연동
 
 ---
 
@@ -203,11 +203,4 @@ ubuntu:latest       065aa8626841         163MB          45.9MB    U
 
 kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ ps -a
     PID TTY          TIME CMD
-   1899 pts/0    00:00:00 ps
-
-
-
-   ![alt text](image-1.png)
-
-
-   
+   1899 pts/0    00:00:00 ps  
