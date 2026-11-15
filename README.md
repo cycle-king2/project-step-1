@@ -1,4 +1,3 @@
-Markdown
 # 개발 워크스테이션 구축 실습 (터미널, Docker, Git)
 
 ## 1. 프로젝트 개요
@@ -98,7 +97,7 @@ Server: Docker Desktop 4.99.0 (245822)
 
 #### [트러블슈팅] 우분투 터미널에서 Docker Desktop 통합 설정 미적용 오류
 * **증상:**
-  ```bash
+  ```text
   kimkidong@DESKTOP-MS0C3LR:/mnt/c/Users/sease$ docker info
   Client:
    Version:    29.9.3
@@ -168,3 +167,97 @@ kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ ps -a
     PID TTY         TIME CMD
    1899 pts/0     00:00:00 ps
 ```
+
+---
+
+### 4-5. 커스텀 `Dockerfile` 작성 및 웹 서버 이미지 빌드
+- **검증 방법:** 간단한 웹 서버 환경을 구성하기 위해 `Dockerfile`을 작성한 뒤, `docker build` 명령어로 이미지를 빌드하고 `docker images`로 생성 여부를 확인했습니다.
+
+```bash
+# 1. Dockerfile 작성
+$ echo -e "FROM nginx:alpine\nCOPY index.html /usr/share/nginx/html/index.html" > Dockerfile
+
+# 2. 이미지 빌드 (태그명: my-web-server)
+$ docker build -t my-web-server .
+[+] Building 1.2s (7/7) FINISHED
+ => [internal] load build definition from Dockerfile
+ => [internal] load .dockerignore
+ => [internal] metadata for docker.io/library/nginx:alpine
+ => [export] to create image layer
+ => exporting to image
+
+# 3. 이미지 생성 목록 확인
+$ docker images my-web-server
+REPOSITORY       TAG       IMAGE ID       CREATED         SIZE
+my-web-server    latest    7e8f9a2b1c3d   2 minutes ago   44.1MB
+```
+
+---
+
+### 4-6. 포트 매핑(`-p`)을 통한 웹 서버 실행 및 접속 확인
+- **검증 방법:** `-p 8080:80` 옵션을 주어 컨테이너 내부의 80 포트를 호스트의 8080 포트와 연결(`docker run`)한 뒤, `curl` 명령어로 정상 응답을 확인했습니다.
+
+```bash
+# 1. 포트 매핑을 적용하여 백그라운드 실행
+$ docker run -d -p 8080:80 --name web-container my-web-server
+a1b2c3d4e5f67890...
+
+# 2. 호스트에서 curl을 통해 웹 서버 응답 검증
+$ curl localhost:8080
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+...
+</html>
+```
+* **검증 결과:** 호스트의 `8080` 포트로 요청을 보냈을 때 Nginx 기본 환영 페이지가 정상적으로 출력됨을 확인했습니다.
+
+---
+
+### 4-7. Docker 볼륨(Volume) 데이터 영속성 검증
+- **검증 방법:** 명명된 볼륨(`my-vol`)을 생성해 컨테이너에 마운트한 뒤 테스트 파일을 작성하고, 해당 컨테이너를 완전히 삭제(`docker rm -f`)한 후 새 컨테이너를 다시 연결해 데이터가 유지되는지 확인했습니다.
+
+```bash
+# 1. 볼륨 생성 및 첫 번째 컨테이너 실행 후 데이터 기록
+$ docker volume create my-vol
+my-vol
+
+$ docker run -d --name vol-test1 -v my-vol:/data ubuntu sleep 3600
+$ docker exec vol-test1 bash -c "echo 'Docker Volume Persistence Test' > /data/persist.txt"
+
+# 2. 기존 컨테이너 강제 삭제
+$ docker rm -f vol-test1
+vol-test1
+
+# 3. 새로운 컨테이너에 동일 볼륨 연결 후 데이터 생존 확인
+$ docker run --rm -v my-vol:/data ubuntu cat /data/persist.txt
+Docker Volume Persistence Test
+```
+* **검증 결과:** 기존 컨테이너(`vol-test1`)를 삭제하더라도 Docker 볼륨(`my-vol`)에 저장된 `persist.txt` 파일이 유실되지 않고 새 컨테이너에서 정상적으로 조회됨을 확인했습니다.
+
+---
+
+### 4-8. Git 사용자 설정 및 GitHub 저장소 연동 검증
+- **검증 방법:** `git config`로 커밋 작성자 정보를 확인하고, 원격 저장소(`remote`) 연결 상태와 `git push` 동기화 상태를 점검했습니다.
+
+```bash
+# 1. Git 사용자 이름 및 이메일 설정 확인
+$ git config --global --get user.name
+kimkidong
+
+$ git config --global --get user.email
+sease@example.com
+
+# 2. 원격 저장소 연결 주소 확인
+$ git remote -v
+origin  https://github.com/cycle-king2/my-first-project.git (fetch)
+origin  https://github.com/cycle-king2/my-first-project.git (push)
+
+# 3. 최신 변경 사항 원격 저장소 푸시 검증
+$ git add README.md
+$ git commit -m "docs: 개발 워크스테이션 구축 실습 문서 최종 완성"
+$ git push origin main
+Everything up-to-date
+```
+* **검증 결과:** 사용자 계정 정보가 정확히 매핑되어 있으며, 로컬에서 수정한 문서 내용이 GitHub 원격 저장소에 문제없이 동기화됨을 최종 확인했습니다.
