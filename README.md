@@ -47,33 +47,23 @@ PS C:\> mkdir -p codyssey/practice
     디렉터리: C:\codyssey
 
 Mode                LastWriteTime         Length Name
-
 ----                -------------         ------ ----
-
 d-----     2026-11-16  오전 12:17                practice
 
 
 PS C:\> cd codyssey/practice
-
 PS C:\codyssey\practice> echo "123" > test.txt
-
 PS C:\codyssey\practice> get-childitem -force
-
 
     디렉터리: C:\codyssey\practice
 
 Mode                LastWriteTime         Length Name
-
 ----                -------------         ------ ----
-
 -a----     2026-11-16  오전 12:18             12 test.txt
 
 
-
 4-2. Docker 설치 및 기본 점검
-
 검증 방법: Docker Desktop 설치 및 WSL 2 연동 후 docker version 명령어를 통해 Client와 Server(엔진) 정상 구동 여부를 확인했습니다.
-
 
 Bash
 
@@ -87,7 +77,6 @@ Client:
  Built:             Tue Nov  3 21:42:08 2026
  OS/Arch:           linux/amd64
  Context:           default
-
 
 Server: Docker Desktop 4.99.0 (245822)
  Engine:
@@ -109,10 +98,7 @@ Server: Docker Desktop 4.99.0 (245822)
   GitCommit:        de40ad0
 
 
-
 [트러블슈팅 1] 우분투 터미널에서 Docker Desktop 통합 설정 미적용 오류
-
-증상:
 
 Bash
 
@@ -125,7 +111,6 @@ Client:
 
 Server:failed to connect to the docker API at npipe:////./pipe/docker_engine; check if the path is correct and if the daemon is running: open //./pipe/docker_engine: The system cannot find the file specified.
 
-
 (원인): WSL(Ubuntu) 환경에서 Docker Desktop 백그라운드 엔진과 통신을 담당하는 WSL 통합(Integration) 설정이 활성화되지 않아 데몬과 연결하지 못하는 문제 발생.
 
 (해결 방법): Docker Desktop 설정 화면으로 이동 (Settings > Resources > WSL integration)
@@ -134,8 +119,6 @@ Enable integration with my default WSL distro 활성화
 Enable integration with additional distros 목록에서 Ubuntu 스위치를 켜짐 상태로 설정 후 재적용
 
 (결과 확인): docker version 명령어를 다시 실행하여 서버 엔진이 정상 응답하는지 최종 검증 완료.
-
-
 
 
 [트러블슈팅 2] 포트 충돌 오류 (Port already allocated)
@@ -151,7 +134,6 @@ Bash
 
 $ docker ps -a
 $docker stop web-container$ docker rm web-container
-
 
 
 4-3. 파일 및 디렉토리 권한 변경 실습
@@ -211,7 +193,6 @@ kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ ps -a
 
 
 4-5. 터미널 파일 및 디렉토리 조작 상세 실습 (생성·복사·이동·삭제)
-
 검증 방법: 리눅스 터미널 환경에서 touch, cp, mv, rm 명령어를 사용해 파일과 디렉토리 생명주기를 관리했습니다.
 
 Bash
@@ -257,7 +238,6 @@ $ rm moved_app.txt
 
 
 4-6. 포트 매핑(-p)을 통한 웹 서버 컨테이너 실행 및 브라우저 접속
-
 **검증 방법:** 호스트의 `8080` 포트와 컨테이너의 `80` 포트를 연결(`-p 8080:80`)하여 Nginx 웹 서버를 실행하고, 브라우저 및 터미널에서 정상 접속을 확인했습니다.
 
 Bash
@@ -272,12 +252,10 @@ CONTAINER ID   IMAGE        COMMAND                  CREATED         STATUS     
 
 ![Docker 컨테이너 포트매핑 후 웹 확인 결과](웹 연동 최초 결과.png)
 
-![Docker 컨테이너 내 내용 수정 후 웹 확인](수정 후 웹연동결과.png)
-
+![Docker 컨테이너 내 내용 수정 후 웹 확인](수정 후 웹 연동결과.png)
 
 
 4-7. 도커 컨테이너 중지, 삭제 및 상태 점검 (stop, rm, ps)
-
 검증 방법: docker stop, docker rm, docker ps 명령어를 통해 컨테이너의 생명주기를 제어하고 실태를 점검했습니다.
 
 Bash
@@ -307,7 +285,6 @@ d03f2c416329   hello-world    "/hello"                 13 hours ago     Exited (
 
 
 4-8. Docker 볼륨 영속성 검증
-
 검증 방법: 도커 볼륨을 생성하고 컨테이너에 연결한 뒤, 컨테이너 삭제 전후로 데이터가 유지되는지 검증했습니다.
 
 
@@ -328,9 +305,7 @@ $ docker rm -f vol-test2
 
 
 
-
 4-9. Git 설정 및 GitHub 연동
-
 검증 방법: 사용자 정보를 설정하고 저장소를 연동하여 최종 푸시를 완료했습니다.
 
 
@@ -376,7 +351,6 @@ hint: See the 'Note about fast-forwards' in 'git push --help' for details.
 
 kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ git push origin main
 
-
 To https://github.com/cycle-king2/my-first-project.git
 
  ! [rejected]        main -> main (fetch first)
@@ -388,13 +362,13 @@ hint: the same ref. If you want to integrate the remote changes, use
 hint: 'git pull' before pushing again.
 hint: See the 'Note about fast-forwards' in 'git push --help' for details.
 
-
 (변경후)
 
 kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ git add .
 kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ git commit -m "docs:최신 버전 반영"
 [main 7be34b1] docs:최신 버전 반영
 kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ git push -u origin main --force
+
 Enumerating objects: 23, done.
 Counting objects: 100% (23/23), done.
 Delta compression using up to 4 threads
@@ -404,7 +378,5 @@ Total 19 (delta 10), reused 0 (delta 0), pack-reused 0 (from 0)
 remote: Resolving deltas: 100% (10/10), completed with 2 local objects.
 
 To https://github.com/cycle-king2/my-first-project.git
-
    389d84d..7be34b1  main -> main
-
 branch 'main' set up to track 'origin/main'.
