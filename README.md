@@ -1,41 +1,37 @@
 Markdown
-
-# 개발 워크스테이션 구축 실습 (터미널, Docker, Git)
-
-
 ## 1. 프로젝트 개요
-
 로컬 개발 환경의 핵심 도구인 터미널(CLI), Docker(컨테이너), Git/GitHub(버전 관리 및 협업)를 직접 세팅하고 검증하여, 어디서든 재현 가능한 개발 워크스테이션을 구축하는 실습입니다.
+
 ---
 
 ## 2. 실행 환경
+* **OS:** Windows 11 (WSL 2 Ubuntu 기반 Docker Engine)
+* **Shell / Terminal:** PowerShell, Bash
+* **Docker:** Docker Desktop 4.99.0 (Engine 29.9.3)
+* **Git:** Git for Windows / WSL Git
 
-**OS:** Windows 11 (WSL 2 Ubuntu 기반 Docker Engine)
-**Shell / Terminal:** PowerShell, Bash
-**Docker:** Docker Desktop 4.99.0 (Engine 29.9.3)
-**Git:** Git for Windows / WSL Git
 ---
 
 ## 3. 수행 항목 체크리스트
+- [x] 터미널 기본 조작 및 작업 디렉토리 구성
+- [x] 파일 및 디렉토리 권한 변경 실습
+- [x] Docker 설치 및 버전/데몬 점검
+- [x] 기본 컨테이너 (`hello-world`, `ubuntu`) 실행 및 운영 명령 확인
+- [x] 커스텀 `Dockerfile` 작성 및 웹 서버 이미지 빌드
+- [x] 포트 매핑 (`-p`)을 통한 브라우저 접속 확인
+- [x] 바인드 마운트 실시간 반영 및 Docker 볼륨 영속성 검증
+- [x] Git 사용자 설정 및 VS Code-GitHub 저장소 연동
 
-[x] 터미널 기본 조작 및 작업 디렉토리 구성
-[x] 파일 및 디렉토리 권한 변경 실습
-[x] Docker 설치 및 버전/데몬 점검
-[x] 기본 컨테이너(`hello-world`, `ubuntu`) 실행 및 운영 명령 확인
-[x] 커스텀 `Dockerfile` 작성 및 웹 서버 이미지 빌드
-[x] 포트 매핑(`-p`)을 통한 브라우저 접속 확인
-[x] 바인드 마운트 실시간 반영 및 Docker 볼륨 영속성 검증
-[x] Git 사용자 설정 및 VS Code-GitHub 저장소 연동
 ---
 
 ## 4. 수행 로그 및 검증 결과
 
 ### 4-1. 작업 디렉토리 및 기본 파일 생성 (PowerShell)
-
+```text
 project-step-1/
 ├── Dockerfile          # Nginx 기반 커스텀 웹 서버 이미지 빌드를 위한 설정 파일
-├── README.md           # 개발 환경 구축, 명령어 실습 기록, 트러블슈팅 및 재현 가이드 문서
-├── app.txt             # 파일 생성·복사·이동·삭제 등 기본 셸 명령어 실습용 텍스트 파일
+├── README.md           # 개발 환경 구축, 명령어 실습 기록 및 재현 가이드 문서
+├── app.txt             # 파일 생성·복사·이동·삭제 등 기본 셸 명령어 실습용 파일
 └── hello.txt           # 파일 권한(chmod 755 등) 변경 및 권한 해석 실습용 파일
 
 - Dockerfile: nginx:alpine 베이스 이미지를 기반으로 정적 웹 서버 환경을 컨테이너로 빌드하기 위한 정의 파일입니다. 다른 사용자가 동일 명령어(docker build -t my-practice-app .)로 오류 없이 이미지를 생성할 수 있도록 합니다. 
