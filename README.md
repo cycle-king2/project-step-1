@@ -281,7 +281,7 @@ Markdown
 > ```bash
 > kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ docker stop web-container
 > kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ docker rm web-container
-> kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ docker ps -a
+> kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ docker ps -a   (4-5 결과 참조)
 > ```
 
 ---
