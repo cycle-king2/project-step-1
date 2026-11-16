@@ -293,13 +293,11 @@ $ docker volume create my_custom_vol
 $docker run -d --name vol-test -v my_custom_vol:/data ubuntu sleep infinity$ docker exec -it vol-test bash -lc "echo 'persistent data test' > /data/test.txt && cat /data/test.txt"
 $ docker rm -f vol-test
 
-
 # 새 컨테이너 연결 후 데이터 유지 확인
 
 $docker run -d --name vol-test2 -v my_custom_vol:/data ubuntu sleep infinity$ docker exec -it vol-test2 bash -lc "cat /data/test.txt"
 
 $ docker rm -f vol-test2
-
 
 ![Docker 볼륨 영속성 검증 결과](volume-test.png)
 
@@ -341,6 +339,26 @@ hint: have locally. This is usually caused by another repository pushing to
 hint: the same ref. If you want to integrate the remote changes, use
 hint: 'git pull' before pushing again.
 hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ git add .
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ git commit -m "최종본 업로드"
+[main 81122eb] 최종본 업로드
+ 2 files changed, 2 insertions(+), 30 deletions(-)
+ create mode 100644 "\352\271\203\355\227\210\353\270\214 \354\273\244\353\260\213-\355\221\270\354\213\234 \352\262\260\352\263\274.png"
+
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ git push origin main
+warning: redirecting to https://github.com/cycle-king2/project-step-1.git/
+Enumerating objects: 6, done.
+Counting objects: 100% (6/6), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (4/4), 219.70 KiB | 9.55 MiB/s, done.
+Total 4 (delta 2), reused 0 (delta 0), pack-reused 0 (from 0)
+remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
+To http://github.com/cycle-king2/project-step-1.git
+   e1f81f4..81122eb  main -> main
+
 
 
 [트러블슈팅 3] 원격 저장소(GitHub)에 로컬 저장소에는 없는 파일(예: 깃허브 생성 시 자동으로 만들어진 README.md, .gitignore, LICENSE 등)이 먼저 존재하기 때문에, 깃허브가 데이터를 덮어쓰는 것을 방지하기 위해 푸시를 거부(Reject)한 상황
