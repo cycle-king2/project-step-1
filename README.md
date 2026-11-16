@@ -387,10 +387,29 @@ docker rm -f vol-test
 
 # 새 컨테이너 연결 후 데이터 유지 확인
 
-docker run -d --name vol-test2 -v my_custom_vol:/data ubuntu sleep infinity$ docker exec -it vol-test2 bash -lc "cat /data/test.txt"
-docker rm -f vol-test2
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ docker volume create my_custom_vol
+my_custom_vol
 
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ docker run -d --name vol-test -v my_custom_vol:/data ubuntu sleep infinity
 
+8aa00465a966db1a598a4b778be27dc5f7507e0bce38771261e51de208217e3b
+
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ docker exec -it vol-test bash -lc "echo 'persistent data test' > /data/test.txt && cat /data/test.txt"
+persistent data test
+
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ docker rm -f vol-test
+vol-test
+
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ docker run -d --name vol-test2 -v my_custom_vol:/data ubuntu sleep infinity
+df04fbc36e9443e321acd7b3f48a39357287a1392e2bf4411c151f61ba5d32c5
+
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ docker exec -it vol-test2 bash -lc "cat /data/test.txt"
+persistent data test
+
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ docker rm -f vol-test2
+vol-test2
+
+![Docker 볼륨 영속성 검증 결과](볼륨 생성-삭제-검증 등.png)
 ![Docker 볼륨 영속성 검증 결과](volume-test.png)
 
 
