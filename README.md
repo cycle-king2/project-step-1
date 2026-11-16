@@ -184,20 +184,47 @@ Markdown
 ---
 
 > ### 4-4. 기본 컨테이너 (`hello-world`, `ubuntu`) 실행 및 운영 실습
-> **검증 방법:** `docker run hello-world`로 도커 엔진의 정상 동작을 확인하고, `docker images` 및 프로세스 조회를 수행했습니다.
+> **검증 방법:** `docker run hello-world`로 도커 엔진의 정상 동작을 확인하고, `docker images` 및 `docker ps -a` 명령어로 이미지와 전체 컨테이너 목록 조회를 수행했습니다.
 > 
+> **1) `docker run hello-world` 실행 결과**
 > ```bash
 > kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ docker run hello-world
 > Hello from Docker!
 > This message shows that your installation appears to be working correctly.
+> To generate this message, Docker took the following steps:
+> 1. The Docker client contacted the Docker daemon.
+> 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+>    (linux/amd64)
+> 3. The Docker daemon created a new container from that image which runs the
+>    executable that produces the output you are currently reading.
+> 4. The Docker daemon outputted that information to the streaming log and exited.
 > 
+> To try something more ambitious, you can run:
+>  $ docker run -it ubuntu bash
+> 
+> Share your images, automate your builds, and share your work on a GitHub chat:
+>  [https://hub.docker.com/](https://hub.docker.com/)
+> ```
+> 
+> **2) `docker images` (로컬 이미지 목록 조회)**
+> ```bash
 > kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ docker images
 > REPOSITORY    TAG       IMAGE ID       DISK USAGE    CONTENT SIZE    EXTRA
 > hello-world   latest    cf1b20a0c89a   25.9kB        9.49kB          U
 > ubuntu        latest    065aa8626841   163MB         45.9MB          U
 > ```
-
----
+> 
+> **3) `docker ps -a` (전체 컨테이너 목록 및 실행 상태 조회 - 필수 누락 보완)**
+> ```bash
+> kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ docker ps -a
+> CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS                      PORTS                 NAMES
+> c2bd3bdb2687   0fd00ecfbd77  "/docker-entrypoint.…"   19 minutes ago   Up 19 minutes               80/tcp                elegant_lovelace
+> 5c772b6cd9d5   my-web:1.0    "/docker-entrypoint.…"   13 hours ago     Exited (255) 20 minutes ago 0.0.0.0:8080->80/tcp  web-server-1
+> 3a2a86eaa141   ubuntu        "bash"                   13 hours ago     Exited (0) 13 hours ago                           my-ubutnu
+> b16d6c712807   hello-world   "/hello"                 13 hours ago     Exited (0) 13 hours ago                           clever_mcclintock
+> a7ca8d35f59c   ubuntu        "bash"                   13 hours ago     Exited (0) 13 hours ago                           my-ubuntu
+> d03f2c416329   hello-world   "/hello"                 13 hours ago     Exited (0) 13 hours ago                           heuristic_swirles
+> ```
 
 > ### 4-5. 터미널 파일 및 디렉토리 조작 상세 실습 (생성·복사·이동·삭제)
 > **검증 방법:** 리눅스 터미널 환경에서 `touch`, `cp`, `mv`, `rm` 명령어를 사용해 파일과 디렉토리 생명주기를 관리했습니다.
