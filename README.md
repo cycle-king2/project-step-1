@@ -32,6 +32,19 @@ Markdown
 
 ### 4-1. 작업 디렉토리 및 기본 파일 생성 (PowerShell)
 
+project-step-1/
+├── Dockerfile          # Nginx 기반 커스텀 웹 서버 이미지 빌드를 위한 설정 파일
+├── README.md           # 개발 환경 구축, 명령어 실습 기록, 트러블슈팅 및 재현 가이드 문서
+├── app.txt             # 파일 생성·복사·이동·삭제 등 기본 셸 명령어 실습용 텍스트 파일
+└── hello.txt           # 파일 권한(chmod 755 등) 변경 및 권한 해석 실습용 파일
+
+- Dockerfile: nginx:alpine 베이스 이미지를 기반으로 정적 웹 서버 환경을 컨테이너로 빌드하기 위한 정의 파일입니다. 다른 사용자가 동일 명령어(docker build -t my-practice-app .)로 오류 없이 이미지를 생성할 수 있도록 합니다. 
+
+- README.md: 개발 환경 구축, 명령어 실습 내용, 환경 설정방법(WSL2 및 Docker 연동), 트러블슈팅 사례, 그리고 재현을 위한 명령어 순서를 기록한 핵심 문서입니다. 시스템을 처음 접하는 사람도 문서에 적힌 순서 그대로 따라 실행했을 때 동일한 결과(웹 서버 구동 및 포트 매핑)를 얻을 수 있도록 기준을 제공합니다.
+
+- app.txt and hello.txt: 리눅스/WSL 환경에서의 파일 조작(cp, mv, rm)과 파일 접근 권한 제어(chmod, 소유권 확인) 실습을 위해 루트 경로에 배치된 샘플 데이터 파일입니다.
+
+
 **검증 방법:** `pwd`, `mkdir`, `echo`, `Get-ChildItem -Force` 명령어로 작업 경로를 생성하고 숨김 파일 포함 목록을 확인했습니다.
 
 ```powershell
@@ -63,10 +76,65 @@ Mode                LastWriteTime         Length Name
 
 
 4-2. Docker 설치 및 기본 점검
-검증 방법: Docker Desktop 설치 및 WSL 2 연동 후 docker version 명령어를 통해 Client와 Server(엔진) 정상 구동 여부를 확인했습니다.
+
+Docker image와 container란?
+"이미지는 설계도(틀), 컨테이너는 그 설계도로 찍어낸 실물(실행 중인 상태)입니다."
+- 이미지 : 애플리케이션 실행에 필요한 코드, 라이브러리, 환경 설정 등을 모아둔 읽기 전용(Read-only) 템플릿
+- 컨테이너 : 이미지를 실행(Run)하여 메모리에 적재하고, 실제로 프로세스가 동작하는 상태
+
+(특징)
+가. 이미지는 원본 파일은 절대 변경되지 않음(수정 불가)
+나. 컨테이너 내부에서 파일 생성·수정·삭제 등 쓰기(Write) 작업 가능
+다. 이미지는 프로그램 설치 파일(ISO) 또는 붕어빵 틀이라고 이해하면 됨. 
+라. 컨테이너는 설치를 마쳐 실행 중인 프로그램 또는 틀로 찍어낸 실제 붕어빵
+
+(추가설명) Dockerfile이란?
+
+- 도커파일(Dockerfile)은 도커 컨테이너의 뼈대가 되는 도커 이미지(Docker Image)를 자동으로 생성(Build)하기 위해 필요한 모든 지침과 설정들을 순차적으로 적어둔 텍스트 파일입니다.
+- 일종의 설계도(Blueprint) : 애플리케이션 실행을 위해 어떤 운영체제(베이스 이미지)를 쓰고, 어떤 라이브러리와 프로그램을 설치해야 하며, 소스 코드를 어디에 배치하고 어떻게 실행해야 하는지 기록한 레시피로 이해하면 됩니다.
+- 도커파일을 사용하는 이유는, "내 컴퓨터에서는 잘 되는데 서버에서는 안 돼요" 같은 환경 차이 문제를 원천로 방지합니다. 수동으로 일일이 명령어를 입력할 필요 없이 docker build 명령어 한 번으로 일관된 이미지를 만들어냅니다.
+- Git 같은 형상 관리 도구로 소스 코드와 함께 관리할 수 있어 환경 변경 이력을 쉽게 추적할 수 있습니다.
+
+<도커파일 생성 예시>
+# 1. 가볍고 성능이 좋은 Nginx Alpine 리눅스 이미지를 베이스로 사용합니다.
+# 2. 호스트(내 컴퓨터)에 있는 웹 페이지 파일을 컨테이너 내부의 Nginx 기본 경로로 복사합니다.
+# 3. 컨테이너 내부에서 사용할 포트(80번)를 외부에 노출한다고 명시합니다.
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/index.html
+EXPOSE 80
+
+
+(추가설명2) 절대경로와 상대경로
+
+가. 절대 경로 : 컴퓨터 파일 시스템의 최상위 루트(Root) 폴더부터 시작해서 목적지까지 거치는 모든 경로를 빠짐없이 적어주는 방식입니다. 내가 지금 어디에 서 있든 상관없이 항상 고정된 하나의 위치를 가리킵니다.
+
+<예시>
+- 윈도우 : C:\Users\kimkidong\project\index.html
+- 리눅스/맥: /home/kimkidong/project/index.html
+
+컨테이너를 실행할 때 내 컴퓨터의 폴더를 연결(-v 옵션)하는 경우, 실행하는 위치에 따라 경로가 꼬이지 않도록 항상 최상위부터 정확히 지정하는 절대 경로 방식을 사용해야 안전합니다.
+(예: -v /home/kimkidong/project:/app)
+
+나. 상대 경로 : 현재 내가 작업하고 있는 위치를 기준으로 목적지까지 찾아가는 방식입니다. 현재 내 위치가 바뀌면 가리키는 실제 파일이나 폴더도 함께 바뀝니다.
+
+<예시>
+-./index.html (현재 내 폴더 안에 있는 파일)
+-../src/main.py (현재 폴더의 바로 위 부모 폴더로 가서 src 안의 파일)
+
+- 도커 적용
+Dockerfile 내부 : COPY . /usr/share/nginx/html처럼 
+도커파일이 놓인 자리를 기준으로 파일을 복사할 때는 상대 경로(.)를 아주 편리하게 사용합니다.
+
+터미널 실행 명령어 : 하지만 docker run -v ./data:/app 처럼 내 컴퓨터 폴더를 연결할 때 상대 경로를 쓰면, 터미널을 연 위치에 따라 연결되는 폴더가 달라져 채점 환경이나 다른 사람의 컴퓨터에서 "파일을 찾을 수 없다"는 치명적인 에러가 발생합니다.
+
+
+
+(수행)
+- Dockerfile과 소스 코드를 바탕으로 my-web:1.0이라는 이미지를 생성합니다. 이 이미지는 고정된 상태(읽기 전용)로 저장소에 보관됩니다.
+
+- 검증 방법: Docker Desktop 설치 및 WSL 2 연동 후 docker version 명령어를 통해 Client와 Server(엔진) 정상 구동 여부를 확인했습니다.
 
 Bash
-
 kimkidong@DESKTOP-MS0C3LR:/mnt/c/Users/sease$ docker version
 
 Client:
@@ -132,8 +200,23 @@ Enable integration with additional distros 목록에서 Ubuntu 스위치를 켜�
 
 Bash
 
-$ docker ps -a
-$docker stop web-container$ docker rm web-container
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ docker ps -a
+CONTAINER ID   IMAGE          COMMAND                  CREATED        STATUS                     PORTS                  NAMES
+c2bd3bdb2687   0fd00ecfbd77   "/docker-entrypoint.…"   8 hours ago    Up 8 hours                 80/tcp                 elegant_lovelace
+5c772b6cd9d5   my-web:1.0     "/docker-entrypoint.…"   21 hours ago   Exited (255) 9 hours ago   0.0.0.0:8080->80/tcp   web-server-1
+3a2a86eaa141   ubuntu         "bash"                   21 hours ago   Exited (0) 21 hours ago                           my-ubutnu
+b16d6c712807   hello-world    "/hello"                 21 hours ago   Exited (0) 21 hours ago                           clever_mcclintock
+a7ca8d35f59c   ubuntu         "bash"                   22 hours ago   Exited (0) 22 hours ago                           my-ubuntu
+d03f2c416329   hello-world    "/hello"                 22 hours ago   Exited (0) 22 hours ago                           heuristic_swirles
+
+
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ docker stop web-server-1
+web-server-1
+
+
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ docker rm my-ubutnu
+my-ubutnu
+
 
 
 4-3. 파일 및 디렉토리 권한 변경 실습
@@ -197,15 +280,14 @@ kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ ps -a
 
 Bash
 # 1. 빈 파일 생성 및 내용 확인
-$ touch app.txt
-$ echo "Hello Codyssey" > app.txt
-$ cat app.txt
+touch app.txt
+echo "Hello Codyssey" > app.txt
+cat app.txt
 Hello Codyssey
 
 # 2. 파일 복사 및 이동(이름 변경)
-$ cp app.txt backup.txt
-$ mv backup.txt moved_app.txt
-$ ls -l
+cp app.txt backup.txt
+mv backup.txt moved_app.txt
 
 Bash
 kimkidong@DESKTOP-MS0C3LR:~/codyssey/practice$ touch test.txt
@@ -237,8 +319,19 @@ Bash
 $ rm moved_app.txt
 
 
+저장된 my-web:1.0 이미지 기반으로 web-server-1이라는 이름의 컨테이너를 생성하여 실행합니다.
+이때 도커는 이미지 위에 읽기-쓰기 레이어(Writable Layer)를 살짝 얹어주기 때문에, 컨테이너 내부에서 로그가 쌓이거나 임시 파일이 만들어져도 원본 이미지에는 전혀 영향을 주지 않습니다.
+동일한 이미지로 여러 개의 독립된 컨테이너(web-server-1, web-server-2)를 동시에 찍어내어 구동할 수 있습니다.
+
+
+
 4-6. 포트 매핑(-p)을 통한 웹 서버 컨테이너 실행 및 브라우저 접속
+도커 컨테이너는 리눅스 커널의 네트워크 네임스페이스 기술을 사용. 독립된 네트워크 환경을 갖습니다. 이로인해 자신만의 가상 IP 주소와 독립 포트 공간을 가지며, 외부(호스트)에서는 컨테이너 내부로 직접 접근이 불가합니다.
+그래서 포트매핑을 통해 호스트 컴퓨터의 포트와 컨테이너 내부 포트를 연결하는 포트 포워딩이 필요합니다.
+컨테이너 내부의 포트는 Nginx 웹서버의 80번 포트(주파수 개념)를 기본값으로 사용합니다. 주로 호스트 운영체제의 포트가 변한다고 이해하면 됩니다.
+
 **검증 방법:** 호스트의 `8080` 포트와 컨테이너의 `80` 포트를 연결(`-p 8080:80`)하여 Nginx 웹 서버를 실행하고, 브라우저 및 터미널에서 정상 접속을 확인했습니다.
+
 
 Bash
 
@@ -257,6 +350,7 @@ CONTAINER ID   IMAGE        COMMAND                  CREATED         STATUS     
 
 4-7. 도커 컨테이너 중지, 삭제 및 상태 점검 (stop, rm, ps)
 검증 방법: docker stop, docker rm, docker ps 명령어를 통해 컨테이너의 생명주기를 제어하고 실태를 점검했습니다.
+
 
 Bash
 
@@ -287,20 +381,45 @@ d03f2c416329   hello-world    "/hello"                 13 hours ago     Exited (
 4-8. Docker 볼륨 영속성 검증
 검증 방법: 도커 볼륨을 생성하고 컨테이너에 연결한 뒤, 컨테이너 삭제 전후로 데이터가 유지되는지 검증했습니다.
 
+컨테이너 실행 및 볼륨 연결(docker run -v 등) : 호스트와 컨테이너를 연결할 때는 실행하는 터미널 위치에 따라 경로가 꼬이거나 에러가 발생하는 것을 방지하기 위해, 항상 명확한 절대 경로 또는 동적 경로($(pwd))를 사용하는 것을 원칙으로 합니다.
+
 
 Bash
-$ docker volume create my_custom_vol
-$docker run -d --name vol-test -v my_custom_vol:/data ubuntu sleep infinity$ docker exec -it vol-test bash -lc "echo 'persistent data test' > /data/test.txt && cat /data/test.txt"
-$ docker rm -f vol-test
+docker volume create my_custom_vol
+docker run -d --name vol-test -v my_custom_vol:/data ubuntu sleep infinity$ docker exec -it vol-test bash -lc "echo 'persistent data test' > /data/test.txt && cat /data/test.txt"
+docker rm -f vol-test
 
 # 새 컨테이너 연결 후 데이터 유지 확인
 
-$docker run -d --name vol-test2 -v my_custom_vol:/data ubuntu sleep infinity$ docker exec -it vol-test2 bash -lc "cat /data/test.txt"
+docker run -d --name vol-test2 -v my_custom_vol:/data ubuntu sleep infinity$ docker exec -it vol-test2 bash -lc "cat /data/test.txt"
+docker rm -f vol-test2
 
-$ docker rm -f vol-test2
 
 ![Docker 볼륨 영속성 검증 결과](volume-test.png)
 
+
+(도커 볼륨 백업 수행)
+
+Bash
+
+docker run --rm -v my_custom_vol:/volume -v $(pwd):/backup alpine tar czvf /backup/vol_backup.tar.gz -C /volume .
+
+
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ ls -l
+total 756
+-rwxrwxrwx 1 kimkidong kimkidong     77 Nov 16 18:25  Dockerfile
+-rwxrwxrwx 1 kimkidong kimkidong  25304 Nov 16 22:40  README.md
+-rwxrwxrwx 1 kimkidong kimkidong     10 Nov 16 22:32  app.txt
+-rwxrwxrwx 1 kimkidong kimkidong     13 Nov 16 18:25  hello.txt
+-rwxrwxrwx 1 kimkidong kimkidong     49 Nov 16 18:25  index.html
+-rwxrwxrwx 1 kimkidong kimkidong      4 Nov 16 22:31  test.txt
+-rwxrwxrwx 1 kimkidong kimkidong    147 Nov 16 22:25  vol_backup.tar.gz
+-rwxrwxrwx 1 kimkidong kimkidong  74574 Nov 16 15:39  volume-test.png
+-rwxrwxrwx 1 kimkidong kimkidong 153195 Nov 16 02:14  ''$'\352\271\203\355\227\210\353\270\214'' '$'\354\227\260\353\217\231'' '$'\352\262\260\352\263\274''.png'
+-rwxrwxrwx 1 kimkidong kimkidong 260055 Nov 16 20:46  ''$'\352\271\203\355\227\210\353\270\214'' '$'\354\273\244\353\260\213''-'$'\355\221\270\354\213\234'' '$'\352\262\260\352\263\274''.png'
+-rwxrwxrwx 1 kimkidong kimkidong  68869 Nov 16 14:20  ''$'\353\217\204\354\273\244\355\214\214\354\235\274'' '$'\354\235\264\353\257\270\354\247\200'' '$'\354\203\235\354\204\261''.png'
+-rwxrwxrwx 1 kimkidong kimkidong  92626 Nov 16 01:47  ''$'\354\210\230\354\240\225'' '$'\355\233\204'' '$'\354\233\271\354\227\260\353\217\231\352\262\260\352\263\274''.png'
+-rwxrwxrwx 1 kimkidong kimkidong  85314 Nov 16 01:53  ''$'\354\233\271'' '$'\354\227\260\353\217\231'' '$'\354\265\234\354\264\210'' '$'\352\262\260\352\263\274''.png'
 
 
 4-9. Git 설정 및 GitHub 연동
@@ -309,12 +428,12 @@ $ docker rm -f vol-test2
 
 Bash
 
-$ git config --global user.name "kimkidong"
-$ git config --global user.email "seasee77@gmail.com"
-$ git init
-$git branch -M main$ git remote add origin <GitHub_Repository_URL>
-$git add .$ git commit -m "docs: Lab 4-1 ~ 4-8 워크스테이션 구축 및 도커/깃 실습 완료"
-$ git push -u origin main
+git config --global user.name "kimkidong"
+git config --global user.email "seasee77@gmail.com"
+git init
+git branch -M main$ git remote add origin <GitHub_Repository_URL>
+git add .$ git commit -m "docs: Lab 4-1 ~ 4-8 워크스테이션 구축 및 도커/깃 실습 완료"
+git push -u origin main
 
 
 ![github 연동결과](깃허브 연동 결과.png)
