@@ -26,8 +26,6 @@ Markdown
 
 ## 4. 수행 로그 및 검증 결과
 
-## 4. 수행 로그 및 검증 결과
-
 ---
 
 > ### 4-1. 작업 디렉토리 및 기본 파일 생성 (PowerShell)
@@ -270,8 +268,8 @@ Markdown
 > 5c772b6cd9d5   my-web:1.0   "/docker-entrypoint.…"   5 seconds ago   Up 4 seconds  0.0.0.0:8080->80/tcp   web-server-1
 > ```
 > 
-> ![Docker 컨테이너 포트매핑 후 웹 확인 결과](웹 연동 최초 결과.png)
-> ![Docker 컨테이너 내 내용 수정 후 웹 확인](수정 후 웹 연동결과.png)
+> ![Docker 컨테이너 포트매핑 후 웹 확인 결과](portmapping-web.png)
+> ![Docker 컨테이너 내 내용 수정 후 웹 확인](re-make&web.png)
 
 ---
 
@@ -309,7 +307,7 @@ Markdown
 > docker run --rm -v my_custom_vol:/volume -v $(pwd):/backup alpine tar czvf /backup/vol_backup.tar.gz -C /volume .
 > ```
 > 
-> ![Docker 볼륨 영속성 검증 결과](볼륨 생성-삭제-검증 등.png)
+> ![Docker 볼륨 영속성 검증 결과](volummake-del.png)
 > ![Docker 볼륨 영속성 검증 결과](volume-test.png)
 
 ---
@@ -328,7 +326,7 @@ Markdown
 > git push -u origin main
 > ```
 > 
-> ![github 연동결과](깃허브 연동 결과.png)
+> ![github 연동결과](git-connect.png)
 > 
 > **최신 버전 반영 및 커밋 푸시:**
 > ```bash
