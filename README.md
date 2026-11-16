@@ -124,7 +124,6 @@ Dockerfile 내부 : COPY . /usr/share/nginx/html처럼
 터미널 실행 명령어 : 하지만 docker run -v ./data:/app 처럼 내 컴퓨터 폴더를 연결할 때 상대 경로를 쓰면, 터미널을 연 위치에 따라 연결되는 폴더가 달라져 채점 환경이나 다른 사람의 컴퓨터에서 "파일을 찾을 수 없다"는 치명적인 에러가 발생합니다.
 
 
-
 (수행)
 - Dockerfile과 소스 코드를 바탕으로 my-web:1.0이라는 이미지를 생성합니다. 이 이미지는 고정된 상태(읽기 전용)로 저장소에 보관됩니다.
 
@@ -175,8 +174,7 @@ Client:
 
 Server:failed to connect to the docker API at npipe:////./pipe/docker_engine; check if the path is correct and if the daemon is running: open //./pipe/docker_engine: The system cannot find the file specified.
 
-(원인): WSL(Ubuntu) 환경에서 Docker Desktop 백그라운드 엔진과 통신을 담당하는 WSL 통합(Integration) 설정이 활성화되지 않아 데몬과 연결하지 못하는 문제 발생.
-
+(원인): WSL(Ubuntu) 환경에서 Docker Desktop 백그라운드 엔진과 통신 담당 WSL 통합(Integration) 설정이 활성화되지 않아 데몬과 연결하지 못하는 문제 발생.
 (해결 방법): Docker Desktop 설정 화면으로 이동 (Settings > Resources > WSL integration)
 
 Enable integration with my default WSL distro 활성화
@@ -185,14 +183,12 @@ Enable integration with additional distros 목록에서 Ubuntu 스위치를 켜�
 (결과 확인): docker version 명령어를 다시 실행하여 서버 엔진이 정상 응답하는지 최종 검증 완료.
 
 
+
 [트러블슈팅 2] 포트 충돌 오류 (Port already allocated)
 
 (증상): docker run 실행 시 Bind for 0.0.0.0:8080 failed: port is already allocated 에러 발생.
-
 (원인): 이미 이전 실습에서 8080 포트를 점유하고 있는 컨테이너가 실행 중인 상태에서 동일한 포트로 컨테이너를 또 띄우려 할 때 발생.
-
 (해결 방법): docker ps로 실행 중인 컨테이너를 확인한 뒤 docker stop 및 docker rm으로 기존 컨테이너를 정리하고 재실행.
-
 
 Bash
 
@@ -215,40 +211,59 @@ my-ubutnu
 
 
 
-4-3. 파일 및 디렉토리 권한 변경 실습
+### 4-3. 파일 및 디렉토리 권한 변경 실습
+**검증 방법:** 리눅스 네이티브 파일 시스템 환경에서 `chmod` 명령어를 사용하여 파일과 디렉토리의 접근 권한을 변경하고 결과를 검증했습니다.
 
-검증 방법: ls -l 및 ls -ld 명령어로 초기 권한을 확인한 뒤, chmod 명령어로 파일과 디렉토리의 권한을 변경하여 전·후 상태를 비교했습니다.
+* **1) 파일 권한 변경 (`hello.txt`: 644 → 755)**
 
-1) 파일 권한 변경 (hello.txt: 644 → 755)
-
-Bash
-
-# 변경 전 권한 확인 (-rw-r--r-- : 644)
-$ ls -l hello.txt
-
--rw-r--r-- 1 kimkidong kimkidong 13 Nov 16 01:08 hello.txt
-
-# 권한 변경 및 결과 확인 (-rwxr-xr-x : 755)
+```bash
+$ touch hello.txt
 $ chmod 755 hello.txt
 $ ls -l hello.txt
--rwxr-xr-x 1 kimkidong kimkidong 13 Nov 16 01:08 hello.txt
+-rwxr-xr-x 1 kimkidong kimkidong 0 Nov 16 23:30 hello.txt
 
-권한 해석 (755 = rwxr-xr-x): 소유자는 읽기·쓰기·실행이 모두 가능하며, 그룹과 기타 사용자는 읽기 및 실행만 가능합니다.
+-권한 해석 (755 = rwxr-xr-x): 소유자는 읽기·쓰기·실행이 모두 가능하며, 그룹과 기타 사용자는 읽기 및 실행만 가능합니다.
 
 
 2) 디렉토리 권한 변경 (my_dir: 755 → 700)
 
-Bash
-
-# 디렉토리 생성 및 변경 전 권한 확인 (drwxr-xr-x : 755)
-$mkdir my_dir$ ls -ld my_dir
-drwxr-xr-x 2 kimkidong kimkidong 4096 Nov 16 01:10 my_dir
-
-# 권한 변경 및 결과 확인 (drwx------ : 700)
+$ mkdir my_dir
 $chmod 700 my_dir$ ls -ld my_dir
-drwx------ 2 kimkidong kimkidong 4096 Nov 16 01:10 my_dir
+drwx------ 2 kimkidong kimkidong 4096 Nov 16 23:31 my_dir
 
-권한 해석 (700 = drwx------): 소유자에게만 모든 권한을 부여하고, 그룹과 기타 사용자의 접근은 완전히 차단했습니다.
+- 권한 해석 (700 = drwx------): 소유자에게만 모든 권한을 부여하고, 그룹과 기타 사용자의 접근은 완전히 차단했습니다.
+
+(실행 결과)
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ cd ~
+kimkidong@DESKTOP-MS0C3LR:~$ mkdir -p practice_perm
+kimkidong@DESKTOP-MS0C3LR:~$ cd practice_perm
+kimkidong@DESKTOP-MS0C3LR:~/practice_perm$ touch hello.txt
+kimkidong@DESKTOP-MS0C3LR:~/practice_perm$ chmod 755 hello.txt
+kimkidong@DESKTOP-MS0C3LR:~/practice_perm$ ls -l hello.txt
+-rwxr-xr-x 1 kimkidong kimkidong 0 Nov 16 23:30 hello.txt
+
+kimkidong@DESKTOP-MS0C3LR:~/practice_perm$ mkdir my_dir
+kimkidong@DESKTOP-MS0C3LR:~/practice_perm$ chmod 700 my_dir
+kimkidong@DESKTOP-MS0C3LR:~/practice_perm$ ls -ld my_dir
+drwx------ 2 kimkidong kimkidong 4096 Nov 16 23:31 my_dir
+
+
+[트러블슈팅 3] 
+
+(현상)
+kimkidong@DESKTOP-MS0C3LR:/mnt/c/codyssey/practice$ ls -l hello.txt
+-rwxrwxrwx 1 kimkidong kimkidong 13 Nov 16 18:25 hello.txt
+
+(진단)
+현 파일 위치 경로(C:\codyssey\practice 또는 /mnt/c/codyssey/practice)는 윈도우 파일 시스템(NTFS)을 WSL 2에서 마운트한 영역(DrvFs)이기 때문에 발생
+윈도우 파일 시스템은 리눅스의 정통 권한 체계(chmod)를 네이티브로 지원하지 않음. 이 때문에 터미널에서 chmod 755를 입력하더라도 실제 윈도우 권한과 매핑되는 방식 때문에 결과가 -rwxrwxrwx(777) 등으로 다르게 표시되거나 고정되어 나타남. 
+이는 WSL 환경에서 윈도우 드라이브를 사용할 때 매우 정상적인 동작입니다.
+
+755(rwxr-xr-x) 권한 변화를 테스트하려면, 윈도우 공유 폴더(/mnt/c/...)가 아닌 리눅스 내부 가상 디스크 영역(예: 홈 디렉토리 ~/codyssey/practice)에 프로젝트를 생성하고 실습을 진행하면 리눅스 권한이 의도대로 정확히 적용
+
+(실행결과)
+- 위에 명령어로 진행해 사실 확인
+
 
 
 4-4. 기본 컨테이너 (hello-world, ubuntu) 실행 및 운영 실습
@@ -495,7 +510,7 @@ To http://github.com/cycle-king2/project-step-1.git
 
 
 
-[트러블슈팅 3] 원격 저장소(GitHub)에 로컬 저장소에는 없는 파일(예: 깃허브 생성 시 자동으로 만들어진 README.md, .gitignore, LICENSE 등)이 먼저 존재하기 때문에, 깃허브가 데이터를 덮어쓰는 것을 방지하기 위해 푸시를 거부(Reject)한 상황
+[트러블슈팅 4] 원격 저장소(GitHub)에 로컬 저장소에는 없는 파일(예: 깃허브 생성 시 자동으로 만들어진 README.md, .gitignore, LICENSE 등)이 먼저 존재하기 때문에, 깃허브가 데이터를 덮어쓰는 것을 방지하기 위해 푸시를 거부(Reject)한 상황
 
 (진단)깃허브에 있는 변경 사항을 먼저 내 컴퓨터로 끌어온(Pull) 후 푸시. 깃허브와 로컬을 각각 따로 초기화(git init)한 경우 히스토리가 달라서 --allow-unrelated-histories 옵션 필요
 
